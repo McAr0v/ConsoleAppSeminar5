@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace ConsoleAppSeminar5
 {
-    internal interface ICalc
+    internal interface ICalc<T>
     {
         event EventHandler<EventArgs> GotResult;
 
-        void ShowStartResult();
+        void ShowStartResult(T i);
 
-        void Add(int i);
+        void Add(T i);
 
-        void Sum(int value);
+        void Sum(T value);
 
-        void Substruct(int value);
+        void Substruct(T value);
 
-        void Multiply(int value);
+        void Multiply(T value);
 
-        void Divide(int value);
+        void Divide(T value);     
 
         void CancelLast();
 

@@ -4,28 +4,23 @@
     {
         static void Calculator_GotResult(object sendler, EventArgs eventArgs )
         {
-            Console.WriteLine($"Текущий результат = {((Calculator)sendler).Result}");
+            Console.WriteLine($"Текущий результат = {Math.Round(((Calculator)sendler).Result, 2)}");
         }
 
-
-        // Функция считывания числа
-        public static int? EnterValueInt(string text)
+        public static double? EnterValueDouble(string text)
         {
             Console.Write(text);
             string input = Console.ReadLine();
 
-            if (int.TryParse(input, out int value))
+            if (double.TryParse(input, out double value))
             {
                 return value;
             }
-
             else
             {
-                
+                Console.WriteLine("Введено не число.");
                 return null;
             }
-
-            
         }
 
         // Функция считывания ввода действия
@@ -34,34 +29,36 @@
             Console.Write(text);
             string value = Console.ReadLine();
 
-            return value;
+            if (value == null) return "";
+            else return value;
         }
 
+       
 
         static void Main(string[] args)
         {
-            /* Доработайте программу калькулятор реализовав выбор действий 
-             * и вывод результатов на экран в цикле так чтобы калькулятор 
-             * мог работать до тех пор пока пользователь не нажмет отмена 
-             * или введёт пустую строку.
+            /* Доработайте класс калькулятора способным работать как 
+             * с целочисленными так и с дробными числами. 
+             * (возможно стоит задействовать перегрузку операций).
             */
 
-            ICalc calc = new Calculator();
+            ICalc<double> calc = new Calculator();
 
             calc.GotResult += Calculator_GotResult;
 
-            calc.ShowStartResult();
+            calc.ShowStartResult(0);
 
             bool Cancel = false;
 
             string InputAction = "";
-            int? InputNumber = null;
+            double? InputNumber = null;
+            
 
             while (!Cancel)
             {
                 InputAction = EnterValueString("Введите действие (+, -, /, *, back (для отмены последнего действия)): ");
 
-                if (InputAction != "back" && InputAction != "") InputNumber = EnterValueInt("Введите число: ");
+                if (InputAction != "back" && InputAction != "") InputNumber = EnterValueDouble("Введите число: ");
 
                 if (InputAction == "" || InputNumber == null)
                 {
@@ -70,25 +67,41 @@
                     break;
                 } else
                 {
-
-                    switch (InputAction)
+                    try 
                     {
-                        case "*":
-                            calc.Multiply((int)InputNumber);
-                            break;
-                        case "/":
-                            calc.Divide((int)InputNumber);
-                            break;
-                        case "+":
-                            calc.Sum((int)InputNumber);
-                            break;
+                        switch (InputAction)
+                        {
+                            case "*":
+                                calc.Multiply((double)InputNumber);
+                                break;
+                            case "/":
+                                calc.Divide((double)InputNumber);
+                                break;
+                            case "+":
+                                calc.Sum((double)InputNumber);
+                                break;
 
-                        case "-":
-                            calc.Substruct((int)InputNumber);
-                            break;
-                        case "back": calc.CancelLast(); break;
+                            case "-":
+                                calc.Substruct((double)InputNumber);
+                                break;
+                            case "back": calc.CancelLast(); break;
 
-                        default: Console.WriteLine("Вы не правильно ввели действие. Попробуйте еще раз"); break;
+                            default: Console.WriteLine("Вы не правильно ввели действие. Попробуйте еще раз"); break;
+                        }
+
+                    }
+                    catch (CalculatorDivideByZeroException e)
+                    { 
+                    
+                        Console.WriteLine($"{e}");
+
+                    }
+
+                    catch (CalculateOperationCauseOverflowException e)
+                    {
+
+                        Console.WriteLine($"{e}");
+
                     }
 
                 }
